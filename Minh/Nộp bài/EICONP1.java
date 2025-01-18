@@ -2,14 +2,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Set;
 
 public class EICONP1 {
 
     static InputReader rd ; 
     static StringBuilder sb = new StringBuilder() ; 
-    static int smallestV = Integer.MAX_VALUE ; // Save giá trị nhỏ nhất 
+    static int smallestV = Integer.MAX_VALUE ; 
 
     public static void main(String[] args) throws IOException {
         
@@ -21,36 +23,35 @@ public class EICONP1 {
         Vertex[] graph = readGraph(nVertices,nEdges);
 
         for ( int i = 0 ; i < graph.length ; i++ ) {
-            if ( ! graph[i].visited ) {   // Với mỗi đỉnh chưa được duyệt
-                int nV = dfs(graph[i], 0 ) ; // 0 là số bắt đầu
+            Vertex vertex = graph[i]; 
 
-                sb.append(smallestV + " " + nV + "\n"); // Đỉnh nhỏ nhất và số lượng đỉnh
+            if ( !vertex.visited ) {
+                int nV = dfs(vertex, 0);
+                
+                sb.append(smallestV + " " + nV + "\n");
                 smallestV = Integer.MAX_VALUE ; 
             }
         }
         System.out.println(sb);
         
     }
-    
-    static int dfs ( Vertex v , int nVertices ) {
-        v.visited = true ; 
-        if ( smallestV > v.id ) {
+
+    static int dfs ( Vertex v , int nVertices  ) {
+        v.visited = true ;
+        if ( smallestV > v.id )  {
             smallestV = v.id ; 
         }
 
-        nVertices++ ; // đếm số lượng đỉnh trong thành phần 
-
-        for ( Vertex vertex : v.adjecentVertices ) {
-
+        nVertices++ ;
+        for ( Vertex vertex : v.adjecentVertices  ) {
             if ( ! vertex.visited ) {
                 nVertices = dfs(vertex, nVertices);
             }
         }
-
-        return nVertices ;  // Trả về số lượng đỉnh trong thành phần hiện tại
+        return nVertices ; 
     }
 
-    static Vertex[] readGraph( int nVertices , int nEdges ) {
+    static Vertex[] readGraph (int nVertices , int nEdges) {
 
         Vertex[] vertices = new Vertex[nVertices];
 
@@ -58,32 +59,29 @@ public class EICONP1 {
             vertices[i] = new Vertex(i);
         }
 
-        for ( int i = 0 ; i < nEdges ;i++ ) {
-            int u = rd.nextInt();
+        for ( int i = 0 ; i < nEdges ; i++ ) {
+            int u = rd.nextInt(); 
             int v = rd.nextInt(); 
 
             vertices[u].addAdjecentVertices(vertices[v]);
             vertices[v].addAdjecentVertices(vertices[u]);
         }
         return vertices ; 
-
     }
-
+    
     static class Vertex {
         public int id ; 
         public boolean visited ; 
 
-        public List<Vertex> adjecentVertices = new ArrayList<>(); 
+        public Set<Vertex> adjecentVertices = new HashSet<>();  
 
-        public Vertex (int id) {
-            this.id = id ;
+        public Vertex ( int id ) {
+            this.id = id ; 
         }
 
         public void addAdjecentVertices ( Vertex v ) {
-            adjecentVertices.add(v);
+            adjecentVertices.add(v); 
         }
-
-    
     }
 
     static class InputReader {
