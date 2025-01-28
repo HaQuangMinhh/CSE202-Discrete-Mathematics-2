@@ -2,60 +2,54 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.InputMismatchException;
 import java.util.List;
-import java.util.Set;
 
 public class EICONP1 {
 
     static InputReader rd ; 
     static StringBuilder sb = new StringBuilder() ; 
-    static int smallestV = Integer.MAX_VALUE ; 
+    static int countVertices = 0 ; // EICONP1
 
     public static void main(String[] args) throws IOException {
-        
         rd = new InputReader(System.in);
 
-        int nVertices = rd.nextInt(); 
-        int nEdges = rd.nextInt(); 
+        var nVertices = rd.nextInt(); 
+        var nEdges = rd.nextInt();
 
-        Vertex[] graph = readGraph(nVertices,nEdges);
+        Vertex[] graph = readGraph(nVertices, nEdges);
 
-        for ( int i = 0 ; i < graph.length ; i++ ) {
-            Vertex vertex = graph[i]; 
+        for ( Vertex v : graph ) {
+            countVertices = 0 ; 
 
-            if ( !vertex.visited ) {
-                int nV = dfs(vertex, 0);
-                
-                sb.append(smallestV + " " + nV + "\n");
-                smallestV = Integer.MAX_VALUE ; 
+            if ( ! v.visited ) {
+                dfs(v);
+                sb.append(v.id).append(" ").append(countVertices).append("\n");
             }
         }
+
         System.out.println(sb);
-        
     }
 
-    static int dfs ( Vertex v , int nVertices  ) {
-        v.visited = true ;
-        if ( smallestV > v.id )  {
-            smallestV = v.id ; 
-        }
 
-        nVertices++ ;
-        for ( Vertex vertex : v.adjecentVertices  ) {
+    static void dfs (Vertex v) {
+        v.visited = true ; 
+        countVertices++ ; 
+
+        for ( Vertex vertex : v.adjecentVertices ) {
             if ( ! vertex.visited ) {
-                nVertices = dfs(vertex, nVertices);
+                dfs(vertex);
             }
         }
-        return nVertices ; 
+
     }
 
-    static Vertex[] readGraph (int nVertices , int nEdges) {
+    static Vertex[] readGraph ( int nVertices , int nEdges ) {
 
-        Vertex[] vertices = new Vertex[nVertices];
+        Vertex[] vertices = new Vertex[nVertices]; 
 
-        for ( int i = 0 ; i < nVertices ;i++ ) {
+        for ( int i = 0 ; i < nVertices ; i++  ) {
             vertices[i] = new Vertex(i);
         }
 
@@ -66,21 +60,25 @@ public class EICONP1 {
             vertices[u].addAdjecentVertices(vertices[v]);
             vertices[v].addAdjecentVertices(vertices[u]);
         }
+
+        for ( Vertex v : vertices ) {
+            Collections.sort( v.adjecentVertices , (v1,v2) -> v1.id - v2.id );
+        }
         return vertices ; 
     }
-    
+
     static class Vertex {
         public int id ; 
         public boolean visited ; 
 
-        public Set<Vertex> adjecentVertices = new HashSet<>();  
+        public List<Vertex> adjecentVertices = new ArrayList<>();
 
-        public Vertex ( int id ) {
-            this.id = id ; 
+        public void addAdjecentVertices (Vertex v ) {
+            adjecentVertices.add(v);
         }
 
-        public void addAdjecentVertices ( Vertex v ) {
-            adjecentVertices.add(v); 
+        public Vertex (int id) {
+            this.id = id ; 
         }
     }
 
@@ -211,5 +209,4 @@ public class EICONP1 {
             }
         }
     }
-
 }
