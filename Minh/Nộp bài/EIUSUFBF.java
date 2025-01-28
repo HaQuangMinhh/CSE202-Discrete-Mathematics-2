@@ -2,92 +2,76 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.InputMismatchException;
 import java.util.List;
-
 
 public class EIUSUFBF {
 
     static InputReader rd ; 
     static StringBuilder sb = new StringBuilder() ; 
+
     public static void main(String[] args) throws IOException {
-        rd = new InputReader(System.in);
-        
-        int numStu = rd.nextInt() ; 
-        int numFriendShip = rd.nextInt(); 
-        int minimumFriend = rd.nextInt() ; 
-        
-        Vertex[] students = readGraph(numStu , numFriendShip) ; 
+        rd = new InputReader(System.in);    
 
-        for ( Vertex student : students ) {
-            sb.append(student.id).append(" ");
+        int nVertices = rd.nextInt(); 
+        int nEdges = rd.nextInt(); 
 
-            student.getFriendSuggestions(minimumFriend);
-            
+        int minimumFriend = rd.nextInt(); 
+
+        Vertex[] graph = readGraph(nVertices, nEdges);
+
+        for ( Vertex vertex : graph ) {
+            sb.append(vertex.id).append(" "); // Từng đỉnh trong đồ thị
+
+            for ( Vertex vertex2 : vertex.adjecentVertices ) {
+                
+                if ( vertex2.adjecentVertices.size() < minimumFriend ) {
+                    sb.append(vertex2.id).append(" ");
+                }
+            }
             sb.append("\n");
         }
-
         System.out.println(sb);
     }
 
-    static Vertex[] readGraph( int numStu , int numFriendShip ) {
-        
-        Vertex[] vertices = new Vertex[numStu]; 
-        for ( int i = 0 ; i < numStu ; i++ ) {
+    static Vertex[] readGraph (int nVertices , int nEdges) {
+
+        Vertex[] vertices = new Vertex[nVertices];
+
+        for ( int i = 0 ; i < nVertices ; i++ ) {
             vertices[i] = new Vertex(i);
         }
-        for ( int i = 0 ; i < numFriendShip ; i++ ) {
-            int u = rd.nextInt(); 
-            int v = rd.nextInt(); 
+
+        for ( int i = 0 ; i < nEdges ; i++ ) {
+            int u = rd.nextInt();
+            int v = rd.nextInt();
 
             vertices[u].addAdjecentVertices(vertices[v]);
             vertices[v].addAdjecentVertices(vertices[u]);
         }
+
+        for ( Vertex v : vertices ) {
+            v.adjecentVertices.sort( (v1,v2) -> v1.id - v2.id );
+        }
+
         return vertices ; 
     }
 
     static class Vertex {
         public int id ; 
 
-        public List<Vertex> adjecentVertices = new ArrayList<>(); 
+        public List<Vertex> adjecentVertices = new ArrayList<>();
 
-        public int getDegree() {
-            return adjecentVertices.size(); 
-        }
-
-        public Vertex(int id ) {
+        public Vertex ( int id ) {
             this.id = id ; 
         }
 
-        public void addAdjecentVertices( Vertex v ) {
+        public void addAdjecentVertices (Vertex v) {
             adjecentVertices.add(v);
         }
 
-        // Danh sách bạn bè của sinh viên cần giới thiệu 
-        public void getFriendSuggestions(int minFriend) {
-            List<Integer> suggestions = new ArrayList<>(); 
-
-            // Check each student in the List
-            for ( Vertex v : adjecentVertices ) {
-                if ( v.getDegree() < minFriend ) {
-                    suggestions.add(v.id);
-                }
-            }
-            // Sort
-            Collections.sort(suggestions);
-
-            // Nếu có gợi ý, thêm vào chuỗi kết quả
-            for ( var suggestion : suggestions) {
-                sb.append(suggestion).append(" ");
-            }
-
-        }
-
     }
-    
+
     static class InputReader {
         private byte[] inbuf = new byte[2 << 23];
         public int lenbuf = 0, ptrbuf = 0;
